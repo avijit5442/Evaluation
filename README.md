@@ -1,2 +1,1 @@
-# Evaluation
-An repository for Evaluation platform
+npm run start to start the services
