@@ -1,4 +1,3 @@
-// Replace the entire file with this content
 import { useState, useEffect, useMemo } from 'react';
 import './App.css';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -158,8 +157,7 @@ function InitialInput() {
       formData.append('Name', form.Name);
       formData.append('Email', form.Email);
       formData.append('DateTime', singleIso);
-      formData.append('optionalDateTimes', JSON.stringify(optionalIsos));
-      // append new dropdown fields (required)
+      optionalIsos.forEach(dt => formData.append('optionalDateTimes[]', dt));
       formData.append('projectConfirmation', form.projectConfirmation);
       formData.append('LongLeavePlans', form.LongLeavePlans);
       formData.append('LocationPreference', form.LocationPreference);
