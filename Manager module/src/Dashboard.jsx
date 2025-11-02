@@ -56,7 +56,6 @@ export default function EmployeeCard({ submission }) {
 
   const feedback = submission.feedback || {};
 
-  // optional alcon screenshot file
   const alcon = submission.alocationFile || null;
   const alconUrl = alcon
     ? `http://localhost:3000/${alcon.path.replace(/\\/g, "/")}`
@@ -98,7 +97,6 @@ export default function EmployeeCard({ submission }) {
           <strong>Long Leave Plans:</strong> {submission.LongLeavePlans || "N/A"}
         </Typography>
 
-        {/* show image filename as text link */}
         {alcon && (
           <Typography
             variant="body2"
@@ -146,7 +144,6 @@ export default function EmployeeCard({ submission }) {
         </Grid>
       </CardContent>
 
-      {/* Feedback Dialog */}
       <Dialog open={openFeedback} onClose={handleFeedbackClose} maxWidth="sm" fullWidth>
         <DialogTitle>Feedback Details</DialogTitle>
         <DialogContent dividers>
@@ -168,7 +165,6 @@ export default function EmployeeCard({ submission }) {
         </DialogActions>
       </Dialog>
 
-      {/* Image Preview Dialog */}
       {alconUrl && (
         <Dialog open={openImage} onClose={handleImageClose} maxWidth="md" fullWidth>
           <DialogTitle>{alcon.originalName}</DialogTitle>

@@ -19,7 +19,6 @@ import {
 } from '@mui/material';
 
 function InitialInput() {
-  // Field error states
   const [fieldErrors, setFieldErrors] = useState({
     singleDateTime: false,
     projectConfirmation: false,
@@ -96,7 +95,6 @@ function InitialInput() {
   const handleCVChange = (e) => handleFileChange(e, 'cv');
   const handleAlconScreenshotChange = (e) => handleFileChange(e, 'alconScreenshot');
 
-  // Helper to check if a value (ms or ISO) falls on an allowed day
   function isDateAllowed(val) {
     if (!allowedDays || allowedDays.size === 0) return false;
     if (!val && val !== 0) return false;
@@ -108,7 +106,6 @@ function InitialInput() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Reset all field errors
     const newErrors = {
       singleDateTime: false,
       projectConfirmation: false,
@@ -116,7 +113,6 @@ function InitialInput() {
       LocationPreference: false
     };
 
-    // Validate all required fields
     let hasErrors = false;
 
     if (!isDateAllowed(form.singleDateTime)) {
@@ -139,10 +135,8 @@ function InitialInput() {
       hasErrors = true;
     }
 
-    // Update error states
     setFieldErrors(newErrors);
 
-    // Stop if there are any errors
     if (hasErrors) {
       return;
     }
@@ -192,7 +186,6 @@ function InitialInput() {
         
         <form onSubmit={handleSubmit} noValidate>
           <Grid container spacing={3}>
-            {/* Required Fields Section */}
             <Grid item xs={12}>
               <Typography variant="h6" sx={{ mb: 2, color: 'primary.main' }}>Required Information</Typography>
             </Grid>
@@ -378,7 +371,6 @@ function InitialInput() {
               </Grid>
             )}
 
-            {/* Leave Plans Section */}
 
             <Grid item xs={12} md={6}>
               <FormControl 
@@ -448,7 +440,6 @@ function InitialInput() {
               </Grid>
             )}
 
-            {/* Location Preference Section */}
 
             <Grid item xs={12} md={6}>
               <FormControl 

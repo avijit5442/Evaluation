@@ -55,14 +55,12 @@ export default function CandidateCards() {
               <strong>Optional:</strong>{' '}
               {(() => {
                 const val = c.optionalDateTimes;
-                // if it's already an array
                 if (Array.isArray(val)) return val.length ? val.join(', ') : '—';
                 if (typeof val === 'string') {
                   try {
                     const parsed = JSON.parse(val);
                     if (Array.isArray(parsed)) return parsed.length ? parsed.join(', ') : '—';
                   } catch {
-                    // not JSON, try comma-separated
                     const parts = val.split(',').map(s => s.trim()).filter(Boolean);
                     if (parts.length) return parts.join(', ');
                   }
@@ -79,7 +77,6 @@ export default function CandidateCards() {
                 type="button"
                 title="Open in Teams"
                 onClick={() => {
-                  // prefer opening chat to candidate email if available
                   if (c.Email) {
                     const chatUrl = `https://teams.microsoft.com/l/chat/0/0?users=${encodeURIComponent(c.Email)}`;
                     window.open(chatUrl, '_blank', 'noopener');
@@ -146,7 +143,6 @@ export default function CandidateCards() {
           onClose={() => setModalState({ open: false, candidate: null })}
           onSubmit={async (payload) => {
             try {
-              // ensure candidateId is included
               const body = { EmpId: modalState.candidate.EmpId || modalState.candidate, ...payload };
               await fetch('http://localhost:3000/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
               alert('Feedback submitted');
