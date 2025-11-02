@@ -97,7 +97,7 @@ export default function CandidateCards() {
               <button
                 className="primary-button"
                 type="button"
-                onClick={() => setModalState({ open: true, candidate: c.EmpId })}
+                onClick={() => setModalState({ open: true, candidate: c })}
               >
                 Send feedback
               </button>
@@ -147,7 +147,7 @@ export default function CandidateCards() {
           onSubmit={async (payload) => {
             try {
               // ensure candidateId is included
-              const body = { EmpId: modalState.candidate || modalState.candidate, ...payload };
+              const body = { EmpId: modalState.candidate.EmpId || modalState.candidate, ...payload };
               await fetch('http://localhost:3000/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
               alert('Feedback submitted');
             } catch (err) {
@@ -167,6 +167,13 @@ function FeedbackModal({ candidate, onClose, onSubmit }) {
     workMode: '', Location: '', projectConfirmation: '', leavePlans: '', experience: '',
     skill: '', communication: '', technicalKnowledge: '', status: '', feedback: '', additionalFeedback: ''
   });
+  useEffect(() =>{
+    console.log('candidate in modal:', candidate);
+setForm(prev => ({ ...prev,
+Location:candidate.LocationPreference ||'',
+projectConfirmation:candidate.projectConfirmation ||'',
+leavePlans:candidate.LongLeavePlans ||'',}))
+  }, []);
 
   function update(k, v) { setForm(prev => ({ ...prev, [k]: v })); }
 
@@ -181,9 +188,24 @@ function FeedbackModal({ candidate, onClose, onSubmit }) {
           <form onSubmit={(e) => { e.preventDefault(); onSubmit(form); }}>
             <div className="modal-grid">
               <input placeholder="Ready to work in Hybrid mode ?" value={form.workMode} onChange={e => update('workMode', e.target.value)} />
-              <input placeholder="Location Constraint" value={form.Location} onChange={e => update('Location', e.target.value)} />
-              <input placeholder="Project Confirmation" value={form.projectConfirmation} onChange={e => update('projectConfirmation', e.target.value)} />
-              <input placeholder="Long Leave Plans" value={form.leavePlans} onChange={e => update('leavePlans', e.target.value)} />
+              <select value={form.Location} onChange={e => update('Location', e.target.value)}>
+                  <option value=""><em>Location Constraint</em></option>
+                  <option value="Bangalore">Bangalore</option>
+                  <option value="Hyderabad">Hyderabad</option>
+                  <option value="Chennai(Mcity)">Chennai(Mcity)</option>
+                  <option value="Pune">Pune</option>
+                  <option value="Trivandrum">Trivandrum</option>
+              </select>
+              <select value={form.projectConfirmation} onChange={e => update('projectConfirmation', e.target.value)}>
+                  <option value=""><em>Project Confirmation</em></option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+              </select>
+              <select value={form.leavePlans} onChange={e => update('leavePlans', e.target.value)}>
+                  <option value=""><em>Long Leave Plans</em></option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+              </select>
               <input placeholder="Experience" value={form.experience} onChange={e => update('experience', e.target.value)} />
               <input placeholder="Skills" value={form.skill} onChange={e => update('Skills', e.target.value)} />
               <input placeholder="Communication" value={form.communication} onChange={e => update('communication', e.target.value)} />
