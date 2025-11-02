@@ -59,7 +59,7 @@ router.get('/dates', (req, res) => {
 
 router.post('/submit', upload.single('cv'), (req, res) => {
   console.log('Received submission:', req.body, req.file);
-  const { Name, EmpId, Email, DateTime, optionalDateTimes, instructions } = req.body;
+  const { Name, EmpId, Email, DateTime, optionalDateTimes, instructions,projectConfirmation,LongLeavePlans,LocationPreference, } = req.body;
   const cvFile = req.file;
 
   if (!DateTime || !cvFile) {
@@ -98,6 +98,9 @@ router.post('/submit', upload.single('cv'), (req, res) => {
     Email,
     DateTime,
     optionalDateTimes: optionalDateTimes || null,
+    projectConfirmation,
+    LongLeavePlans,
+    LocationPreference,
     instructions: instructions || null,
     file: {
       originalName: cvFile.originalname,

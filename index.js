@@ -1,6 +1,6 @@
 import express from 'express';
 import testRouter from './routes/test.js';
-import dateRouter from './routes/dateToSelect.js';
+import API from './routes/API.js';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 // routes
 app.use(testRouter);
-app.use(dateRouter);
+app.use(API);
 const port = 3000;
 
 app.listen(port, () => {
