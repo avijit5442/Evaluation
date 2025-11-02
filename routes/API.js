@@ -57,91 +57,112 @@ router.get('/dates', (req, res) => {
   res.json({ dates });
 });
 
-router.post('/submit',upload.fields([
- {name: 'cv', maxCount: 1},
- {name: 'alconScreenshot', maxCount: 1}
-]), (req, res) => {
-  const { Name, EmpId, Email, DateTime,optionalDateTimes, instructions,projectConfirmation,LongLeavePlans,leavePlanDetails,LocationPreference, } = req.body;
-  const cv = req.files.cv[0];
-  const alconScreenshot = req.files.alconScreenshot[0];
-if (!DateTime || !cv) {
-    return res.status(400).json({ error: 'DateTime and CV file are required.' });
-  }
+router.post(
+  '/submit',
+  upload.fields([
+    { name: 'cv', maxCount: 1 },
+    { name: 'alconScreenshot', maxCount: 1 },
+  ]),
+  (req, res) => {
+    const {
+      Name,
+      EmpId,
+      Email,
+      DateTime,
+      optionalDateTimes,
+      instructions,
+      projectConfirmation,
+      LongLeavePlans,
+      leavePlanDetails,
+      LocationPreference,
+    } = req.body;
 
-
-  // create final filename: `${Name}-${EmpId}-${Email}${ext}`
-  const ext = path.extname(cv.originalname) || '';
-  const sanitize = s => (s || '').toString().replace(/[\\/:*?"<>|]+/g, '-').trim();
-  const baseName = `${sanitize(Name)}-${sanitize(EmpId)}-${sanitize(Email)}`.replace(/\s+/g, '-');
-  let finalName = `${baseName}${ext}`;
-  // Avoid overwrites
-  let targetPath = path.join(UPLOADS_DIR, finalName);
-  let counter = 1;
-  while (fs.existsSync(targetPath)) {
-    finalName = `${baseName}-${counter}${ext}`;
-    targetPath = path.join(UPLOADS_DIR, finalName);
-    counter += 1;
-  }
-
-  try {
-    // move/rename the multer-saved file to the final name in uploads/
-    fs.renameSync(cv.path, targetPath);
-  } catch (err) {
-    console.error('Failed to move uploaded file:', err);
-    return res.status(500).json({ error: 'Failed to save uploaded file' });
-  }
-
-  // Build submission object
-  const submissionId = uuidv4();
-  const submission = {
-    id: submissionId,
-    Name,
-    EmpId,
-    Email,
-    DateTime,
-    optionalDateTimes: optionalDateTimes || null,
-    projectConfirmation,
-    LongLeavePlans,
-    leavePlanDetails,
-    LocationPreference,
-    instructions: instructions || null,
-    Cvfile: {
-      originalName: cv.originalname,
-      mimeType: cv.mimetype,
-      size: cv.size,
-      savedName: finalName,
-      path: path.relative(process.cwd(), targetPath).replace(/\\/g, '/'),
-    },
-    alocationFile: {
-      originalName: alconScreenshot.originalname,
-      mimeType: alconScreenshot.mimetype,
-      size: alconScreenshot.size,
-      savedName: finalName,
-      path: path.relative(process.cwd(), targetPath).replace(/\\/g, '/'),
-    },
-    createdAt: new Date().toISOString()
-  };
-
-  // persist submission into single JSON file (submissions/submissions.json)
-  const submissionsFile = path.join(SUBMISSIONS_DIR, 'submissions.json');
-  try {
-    let list = [];
-    if (fs.existsSync(submissionsFile)) {
-      const raw = fs.readFileSync(submissionsFile, 'utf8');
-      list = raw.trim() ? JSON.parse(raw) : [];
-      if (!Array.isArray(list)) list = [];
+    const cv = req.files?.cv?.[0];
+    const alconScreenshot = req.files?.alconScreenshot?.[0]; // ✅ optional
+console.log("submission body:", req.body,req.files);
+    if (!DateTime || !cv) {
+      return res.status(400).json({ error: 'DateTime and CV file are required.' });
     }
 
-    list.push(submission);
-    const tmpFile = submissionsFile + '.tmp';
-    fs.writeFileSync(tmpFile, JSON.stringify(list, null, 2), 'utf8');
-    fs.renameSync(tmpFile, submissionsFile);
-  } catch (err) {
-    console.error('Failed to append submission:', err);
-    return res.status(500).json({ error: 'Failed to save submission' });
+    const ext = path.extname(cv.originalname) || '';
+    const sanitize = (s) =>
+      (s || '').toString().replace(/[\\/:*?"<>|]+/g, '-').trim();
+    const baseName = `${sanitize(Name)}-${sanitize(EmpId)}-${sanitize(Email)}`.replace(/\s+/g, '-');
+    let finalName = `${baseName}${ext}`;
+    let targetPath = path.join(UPLOADS_DIR, finalName);
+    let counter = 1;
+
+    while (fs.existsSync(targetPath)) {
+      finalName = `${baseName}-${counter}${ext}`;
+      targetPath = path.join(UPLOADS_DIR, finalName);
+      counter += 1;
+    }
+
+    try {
+      fs.renameSync(cv.path, targetPath);
+    } catch (err) {
+      console.error('Failed to move uploaded file:', err);
+      return res.status(500).json({ error: 'Failed to save uploaded file' });
+    }
+
+    const submissionId = uuidv4();
+
+    const submission = {
+      id: submissionId,
+      Name,
+      EmpId,
+      Email,
+      DateTime,
+      optionalDateTimes: optionalDateTimes || null,
+      projectConfirmation,
+      LongLeavePlans,
+      leavePlanDetails,
+      LocationPreference,
+      instructions: instructions || null,
+      Cvfile: {
+        originalName: cv.originalname,
+        mimeType: cv.mimetype,
+        size: cv.size,
+        savedName: finalName,
+        path: path.relative(process.cwd(), targetPath).replace(/\\/g, '/'),
+      },
+      // ✅ optional field — only add if uploaded
+      alocationFile: alconScreenshot
+        ? {
+            originalName: alconScreenshot.originalname,
+            mimeType: alconScreenshot.mimetype,
+            size: alconScreenshot.size,
+            savedName: alconScreenshot.filename || alconScreenshot.originalname,
+            path: path.relative(process.cwd(), alconScreenshot.path).replace(/\\/g, '/'),
+          }
+        : null,
+      createdAt: new Date().toISOString(),
+    };
+
+    const submissionsFile = path.join(SUBMISSIONS_DIR, 'submissions.json');
+
+    try {
+      let list = [];
+      if (fs.existsSync(submissionsFile)) {
+        const raw = fs.readFileSync(submissionsFile, 'utf8');
+        list = raw.trim() ? JSON.parse(raw) : [];
+        if (!Array.isArray(list)) list = [];
+      }
+
+      list.push(submission);
+
+      const tmpFile = submissionsFile + '.tmp';
+      fs.writeFileSync(tmpFile, JSON.stringify(list, null, 2), 'utf8');
+      fs.renameSync(tmpFile, submissionsFile);
+    } catch (err) {
+      console.error('Failed to append submission:', err);
+      return res.status(500).json({ error: 'Failed to save submission' });
+    }
+
+    res.json({ message: 'Submission received!', submission });
   }
-  res.json({ message: 'Submission received!', submission });
-});
+);
+
 
 router.get('/submissions', (req, res) => {
   const includeFile = req.query.includeFile === 'true';
@@ -252,6 +273,48 @@ router.post('/feedback', (req, res) => {
     return res.status(500).json({ error: 'Failed to save feedback' });
   }
 });
+router.post('/send-result', (req, res) => {
+  const { EmpId, Result } = req.body || {};
+
+  if (!EmpId) {
+    return res.status(400).json({ error: 'EmpId is required' });
+  }
+
+  const resultsFile = path.join(SUBMISSIONS_DIR, 'final-Result.json');
+
+  try {
+    let results = [];
+
+    // ✅ Read existing file if it exists
+    if (fs.existsSync(resultsFile)) {
+      const rawData = fs.readFileSync(resultsFile, 'utf8');
+      results = rawData.trim() ? JSON.parse(rawData) : [];
+      if (!Array.isArray(results)) results = [];
+    }
+
+    // ✅ Create new result entry
+    const newResult = {
+      EmpId,
+      Result,
+      updatedAt: new Date().toLocaleString()
+    };
+
+    // ✅ Append the new one
+    results.push(newResult);
+
+    // ✅ Write safely via temp file (prevents corruption)
+    const tmpFile = resultsFile + '.tmp';
+    fs.writeFileSync(tmpFile, JSON.stringify(results, null, 2), 'utf8');
+    fs.renameSync(tmpFile, resultsFile);
+
+    // ✅ Respond success
+    res.json({ message: 'Result saved successfully', newResult });
+  } catch (err) {
+    console.error('Failed to attach finalResult :', err);
+    return res.status(500).json({ error: 'Failed to save finalResult' });
+  }
+});
+
 
 
 
