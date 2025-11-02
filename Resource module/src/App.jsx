@@ -1,10 +1,10 @@
 
 import './App.css'
-import DateTimeForm from './DateTimeForm'
+import InitialInput from './InitialInput'
 
 function App() {
   return (
-<DateTimeForm/>
+<InitialInput/>
   )
 }
 
