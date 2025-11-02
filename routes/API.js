@@ -57,21 +57,23 @@ router.get('/dates', (req, res) => {
   res.json({ dates });
 });
 
-router.post('/submit', upload.single('cv'), (req, res) => {
-  console.log('Received submission:', req.body, req.file);
-  const { Name, EmpId, Email, DateTime, optionalDateTimes, instructions,projectConfirmation,LongLeavePlans,LocationPreference, } = req.body;
-  const cvFile = req.file;
-
-  if (!DateTime || !cvFile) {
+router.post('/submit',upload.fields([
+ {name: 'cv', maxCount: 1},
+ {name: 'alconScreenshot', maxCount: 1}
+]), (req, res) => {
+  const { Name, EmpId, Email, DateTime,optionalDateTimes, instructions,projectConfirmation,LongLeavePlans,leavePlanDetails,LocationPreference, } = req.body;
+  const cv = req.files.cv[0];
+  const alconScreenshot = req.files.alconScreenshot[0];
+if (!DateTime || !cv) {
     return res.status(400).json({ error: 'DateTime and CV file are required.' });
   }
 
+
   // create final filename: `${Name}-${EmpId}-${Email}${ext}`
-  const ext = path.extname(cvFile.originalname) || '';
+  const ext = path.extname(cv.originalname) || '';
   const sanitize = s => (s || '').toString().replace(/[\\/:*?"<>|]+/g, '-').trim();
   const baseName = `${sanitize(Name)}-${sanitize(EmpId)}-${sanitize(Email)}`.replace(/\s+/g, '-');
   let finalName = `${baseName}${ext}`;
-
   // Avoid overwrites
   let targetPath = path.join(UPLOADS_DIR, finalName);
   let counter = 1;
@@ -83,7 +85,7 @@ router.post('/submit', upload.single('cv'), (req, res) => {
 
   try {
     // move/rename the multer-saved file to the final name in uploads/
-    fs.renameSync(cvFile.path, targetPath);
+    fs.renameSync(cv.path, targetPath);
   } catch (err) {
     console.error('Failed to move uploaded file:', err);
     return res.status(500).json({ error: 'Failed to save uploaded file' });
@@ -100,12 +102,20 @@ router.post('/submit', upload.single('cv'), (req, res) => {
     optionalDateTimes: optionalDateTimes || null,
     projectConfirmation,
     LongLeavePlans,
+    leavePlanDetails,
     LocationPreference,
     instructions: instructions || null,
-    file: {
-      originalName: cvFile.originalname,
-      mimeType: cvFile.mimetype,
-      size: cvFile.size,
+    Cvfile: {
+      originalName: cv.originalname,
+      mimeType: cv.mimetype,
+      size: cv.size,
+      savedName: finalName,
+      path: path.relative(process.cwd(), targetPath).replace(/\\/g, '/'),
+    },
+    alocationFile: {
+      originalName: alconScreenshot.originalname,
+      mimeType: alconScreenshot.mimetype,
+      size: alconScreenshot.size,
       savedName: finalName,
       path: path.relative(process.cwd(), targetPath).replace(/\\/g, '/'),
     },

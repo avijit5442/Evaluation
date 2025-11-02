@@ -289,5 +289,32 @@
       "additionalFeedback": "",
       "feedbackAt": "2025-11-02T10:25:52.825Z"
     }
+  },
+  {
+    "id": "4f97100b-631b-419b-a73e-7713cb623238",
+    "Name": "Avijit Behera",
+    "EmpId": "1345004",
+    "Email": "princesatya53@gmail.com",
+    "DateTime": "2025-11-04T00:00:00+05:30",
+    "optionalDateTimes": "[\"2025-11-04T00:00:00+05:30\"]",
+    "projectConfirmation": "Yes",
+    "LongLeavePlans": "Yes",
+    "LocationPreference": "Chennai(Mcity)",
+    "instructions": null,
+    "Cvfile": {
+      "originalName": "1761387878723-8dijsw.docx",
+      "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "size": 45108,
+      "savedName": "Avijit-Behera-1345004-princesatya53@gmail.com-6.docx",
+      "path": "uploads/Avijit-Behera-1345004-princesatya53@gmail.com-6.docx"
+    },
+    "alocationFile": {
+      "originalName": "SIGN.jpg",
+      "mimeType": "image/jpeg",
+      "size": 21309,
+      "savedName": "Avijit-Behera-1345004-princesatya53@gmail.com-6.docx",
+      "path": "uploads/Avijit-Behera-1345004-princesatya53@gmail.com-6.docx"
+    },
+    "createdAt": "2025-11-02T14:01:05.115Z"
   }
 ]
