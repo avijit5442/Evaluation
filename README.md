@@ -1,1 +1,1 @@
-npm run start to start the services
+"npm install" -> "npm run start" to start the services
