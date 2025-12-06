@@ -1,2 +1,1 @@
-# React + Vite
-To start - npm run start
+To start : "npm i" -> "npm run start"

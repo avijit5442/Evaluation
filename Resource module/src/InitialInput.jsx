@@ -17,9 +17,12 @@ import {
   MenuItem,
   FormHelperText,
 } from '@mui/material';
+import NotificationPanel from './Utils/Notification';
 
 function InitialInput() {
   const [fieldErrors, setFieldErrors] = useState({
+    EmpId: false,
+    Name: false,
     singleDateTime: false,
     projectConfirmation: false,
     LongLeavePlans: false,
@@ -27,8 +30,8 @@ function InitialInput() {
   });
 
   const [form, setForm] = useState({
-    EmpId: '1345004',
-    Name: 'Avijit Behera',
+    EmpId: null,
+    Name: null,
     Email: 'princesatya53@gmail.com',
     singleDateTime: '',
     additionalDateTimes: [''],
@@ -41,6 +44,7 @@ function InitialInput() {
     cv: null,
   });
   const [submitting, setSubmitting] = useState(false);
+  const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
   const [availableDates, setAvailableDates] = useState([]);
   const [loadingDates, setLoadingDates] = useState(true);
   const [datesError, setDatesError] = useState(null);
@@ -93,7 +97,7 @@ function InitialInput() {
   };
 
   const handleCVChange = (e) => handleFileChange(e, 'cv');
-  const handleAlconScreenshotChange = (e) => handleFileChange(e, 'alconScreenshot');
+  // const handleAlconScreenshotChange = (e) => handleFileChange(e, 'alconScreenshot');
 
   function isDateAllowed(val) {
     if (!allowedDays || allowedDays.size === 0) return false;
@@ -103,10 +107,14 @@ function InitialInput() {
     return allowedDays.has(d.format('YYYY-MM-DD'));
   }
 
+  const handleNotificationClose = () => setNotification(n => ({ ...n, open: false }));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     const newErrors = {
+      EmpId: false,
+      Name: false,
       singleDateTime: false,
       projectConfirmation: false,
       LongLeavePlans: false,
@@ -114,6 +122,16 @@ function InitialInput() {
     };
 
     let hasErrors = false;
+
+    if (!form.EmpId || form.EmpId.trim() === '') {
+      newErrors.EmpId = true;
+      hasErrors = true;
+    }
+
+    if (!form.Name || form.Name.trim() === '') {
+      newErrors.Name = true;
+      hasErrors = true;
+    }
 
     if (!isDateAllowed(form.singleDateTime)) {
       newErrors.singleDateTime = true;
@@ -138,6 +156,11 @@ function InitialInput() {
     setFieldErrors(newErrors);
 
     if (hasErrors) {
+      setNotification({
+        open: true,
+        message: 'Please fill all required fields correctly',
+        severity: 'error',
+      });
       return;
     }
 
@@ -171,9 +194,18 @@ function InitialInput() {
       });
       const data = await response.json();
       console.log('Submission response:', data);
-      // Optionally show a success message here
+      setNotification({
+        open: true,
+        message: `${data.message} for EmpId - ${data.submission?.EmpId ?? form.EmpId}`,
+        severity: 'success',
+      });
     } catch (err) {
       console.log(`Submission failed with error ${err}`);
+      setNotification({
+        open: true,
+        message: 'Something went wrong, please try again',
+        severity: 'error',
+      });
     } finally {
       setSubmitting(false);
     }
@@ -186,10 +218,34 @@ function InitialInput() {
         
         <form onSubmit={handleSubmit} noValidate>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Typography variant="h6" sx={{ mb: 2, color: 'primary.main' }}>Required Information</Typography>
+            <Grid item xs={12} md={6}>
+              <TextField
+                label="Name"
+                value={form.Name || ''}
+                onChange={e => {
+                  setForm(f => ({ ...f, Name: e.target.value }));
+                  setFieldErrors(prev => ({ ...prev, Name: false }));
+                }}
+                fullWidth
+                required
+                error={fieldErrors.Name}
+                helperText={fieldErrors.Name ? 'Name is required' : ''}
+              />
             </Grid>
-
+            <Grid item xs={12} md={6}>
+              <TextField
+                label="Emp ID"
+                value={form.EmpId || ''}
+                onChange={e => {
+                  setForm(f => ({ ...f, EmpId: e.target.value }));
+                  setFieldErrors(prev => ({ ...prev, EmpId: false }));
+                }}
+                fullWidth
+                required
+                error={fieldErrors.EmpId}
+                helperText={fieldErrors.EmpId ? 'Emp ID is required' : ''}
+              />
+            </Grid>
             <Grid item xs={12} md={6}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 {loadingDates ? (
@@ -238,21 +294,6 @@ function InitialInput() {
               </LocalizationProvider>
             </Grid>
 
-            <Grid item xs={12} md={6}>
-              <input
-                id="cv-upload"
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={handleCVChange}
-                style={{ display: 'none' }}
-                required
-              />
-              <label htmlFor="cv-upload">
-                <Button variant="contained" component="span">Upload CV (PDF/DOC)</Button>
-                {form.cv && <Typography component="span" sx={{ ml: 2 }}>{form.cv.name}</Typography>}
-              </label>
-            </Grid>
-
             <Grid item xs={12}>
               <Grid container spacing={1}>
                 {form.additionalDateTimes.map((dt, idx) => (
@@ -296,6 +337,20 @@ function InitialInput() {
               </Grid>
             </Grid>
 
+            <Grid item xs={12} md={6}>
+              <input
+                id="cv-upload"
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={handleCVChange}
+                style={{ display: 'none' }}
+                required
+              />
+              <label htmlFor="cv-upload">
+                <Button variant="contained" component="span">Upload CV (PDF/DOC)</Button>
+                {form.cv && <Typography component="span" sx={{ ml: 2 }}>{form.cv.name}</Typography>}
+              </label>
+            </Grid>
 
             <Grid item xs={12} md={6}>
               <FormControl 
@@ -514,6 +569,12 @@ function InitialInput() {
           </Grid>
         </form>
       </Paper>
+      <NotificationPanel
+        open={notification.open}
+        message={notification.message}
+        severity={notification.severity}
+        onClose={handleNotificationClose}
+      />
     </Box>
   );
 }
