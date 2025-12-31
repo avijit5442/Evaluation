@@ -259,9 +259,7 @@ router.post('/send-result', (req, res) => {
   if (!EmpId) {
     return res.status(400).json({ error: 'EmpId is required' });
   }
-
   const resultsFile = path.join(SUBMISSIONS_DIR, 'final-Result.json');
-
   try {
     let results = [];
 
