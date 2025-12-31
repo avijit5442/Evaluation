@@ -32,7 +32,7 @@ function InitialInput() {
   const [form, setForm] = useState({
     EmpId: null,
     Name: null,
-    Email: 'princesatya53@gmail.com',
+    Email: 'avijit.behera@infosys.com',
     singleDateTime: '',
     additionalDateTimes: [''],
     projectConfirmation: '',
