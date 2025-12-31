@@ -99,41 +99,22 @@ export default function CandidateCards() {
                 Send feedback
               </button>
             </div>
-            {c.file && (
               <button
                 className="download-link"
-                onClick={async () => {
-                  try {
-                    setDownloadingIds(prev => new Set(prev).add(c.id));
-                    const path = c.file.path.startsWith('http') ? c.file.path : `http://localhost:3000/${c.file.path}`;
-                    const res = await fetch(path);
-                    if (!res.ok) throw new Error('Failed to download file');
-                    const blob = await res.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = c.file.originalName || 'file';
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    window.URL.revokeObjectURL(url);
-                  } catch (err) {
-                    console.error('Download error', err);
-                    alert('Could not download file: ' + (err.message || 'unknown'));
-                  } finally {
-                    setDownloadingIds(prev => {
-                      const copy = new Set(prev);
-                      copy.delete(c.id);
-                      return copy;
-                    });
-                  }
+                onClick={() => {
+                  const path = c.Cvfile.path.startsWith('http') ? c.Cvfile.path : `http://localhost:3000/${c.Cvfile.path}`;
+                  const a = document.createElement('a');
+                  a.href = path;
+                  a.download = c.Cvfile.originalName || 'file';
+                  a.target = '_blank';
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
                 }}
                 type="button"
-                disabled={downloadingIds.has(c.id)}
               >
-                {downloadingIds.has(c.id) ? 'Downloading...' : 'Download Resume'}
+                Download Resume
               </button>
-            )}
           </div>
         </div>
       ))}

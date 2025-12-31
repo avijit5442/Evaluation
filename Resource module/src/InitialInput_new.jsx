@@ -436,37 +436,35 @@ function InitialInput() {
                             ) : allowedDays.size === 0 ? (
                               <TextField disabled value="No dates" fullWidth sx={{ '& .MuiOutlinedInput-root': { height: 56, boxSizing: 'border-box' } }} />
                             ) : (
-                              <Box>
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                  <DateTimePicker
-                                    label={`Slot 2`}
-                                    value={form.additionalDateTimes[0] ? (dayjs(Number(form.additionalDateTimes[0])).isValid() ? dayjs(Number(form.additionalDateTimes[0])) : null) : null}
-                                    onChange={newValue => setForm(f => {
-                                      const next = [...f.additionalDateTimes];
-                                      next[0] = newValue && newValue.isValid() ? newValue.valueOf() : '';
-                                      return { ...f, additionalDateTimes: next };
-                                    })}
-                                    shouldDisableDate={date => {
-                                      if (!allowedDays || allowedDays.size === 0) return true;
-                                      return !allowedDays.has(dayjs(date).format('YYYY-MM-DD'));
-                                    }}
-                                    slotProps={{ textField: { fullWidth: true, sx: { '& .MuiOutlinedInput-root': { height: 56, boxSizing: 'border-box' } } } }}
-                                    disablePast
-                                    ampm={false}
-                                  />
-                                </LocalizationProvider>
-                                {form.additionalDateTimes.length > 1 && (
-                                  <Button 
-                                    size="small" 
-                                    color="error" 
-                                    onClick={() => removeMultiDateTime(0)}
-                                    fullWidth
-                                    sx={{ mt: 1, fontSize: '0.8rem' }}
-                                  >
-                                    Remove
-                                  </Button>
-                                )}
-                              </Box>
+                              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DateTimePicker
+                                  label={`Slot 2`}
+                                  value={form.additionalDateTimes[0] ? (dayjs(Number(form.additionalDateTimes[0])).isValid() ? dayjs(Number(form.additionalDateTimes[0])) : null) : null}
+                                  onChange={newValue => setForm(f => {
+                                    const next = [...f.additionalDateTimes];
+                                    next[0] = newValue && newValue.isValid() ? newValue.valueOf() : '';
+                                    return { ...f, additionalDateTimes: next };
+                                  })}
+                                  shouldDisableDate={date => {
+                                    if (!allowedDays || allowedDays.size === 0) return true;
+                                    return !allowedDays.has(dayjs(date).format('YYYY-MM-DD'));
+                                  }}
+                                  slotProps={{ textField: { fullWidth: true, sx: { '& .MuiOutlinedInput-root': { height: 56, boxSizing: 'border-box' } } } }}
+                                  disablePast
+                                  ampm={false}
+                                />
+                              </LocalizationProvider>
+                            )}
+                            {form.additionalDateTimes.length > 1 && (
+                              <Button 
+                                size="small" 
+                                color="error" 
+                                onClick={() => removeMultiDateTime(0)}
+                                fullWidth
+                                sx={{ mt: 1, fontSize: '0.8rem' }}
+                              >
+                                Remove
+                              </Button>
                             )}
                           </Box>
                         )}
